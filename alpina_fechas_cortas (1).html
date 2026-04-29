@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Alpina — Fechas Cortas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --blue:       #0057A8;
+  --blue-dark:  #003D7A;
+  --blue-light: rgba(0,87,168,0.09);
+  --blue-mid:   rgba(0,87,168,0.18);
+  --blue-glow:  rgba(0,87,168,0.28);
+  --glass:      rgba(255,255,255,0.72);
+  --glass-card: rgba(255,255,255,0.84);
+  --glass-in:   rgba(255,255,255,0.58);
+  --border:     rgba(0,87,168,0.13);
+  --txt-dark:   #0A1F3A;
+  --txt-mid:    #3A5A78;
+  --txt-soft:   #6A8BA8;
+  --ok:         #0E7C4A;
+  --ok-bg:      rgba(14,124,74,0.10);
+  --r:          18px;
+  --rsm:        12px;
+  --rxs:        8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  color:var(--txt-dark);
+  min-height:100vh;
+  background:linear-gradient(148deg,#d8eaff 0%,#eaf3ff 45%,#f0f8ff 70%,#e2eef9 100%);
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+body::before,body::after{
+  content:'';position:fixed;border-radius:50%;
+  filter:blur(72px);pointer-events:none;z-index:0;
+}
+body::before{width:320px;height:320px;background:rgba(0,87,168,0.12);top:-90px;right:-70px}
+body::after {width:260px;height:260px;background:rgba(0,87,168,0.08);bottom:70px;left:-60px}
+
+/* HEADER */
+.header{
+  background:var(--glass);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
+  padding:13px 18px;
+  display:flex;align-items:center;gap:11px;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 20px rgba(0,87,168,0.08);
+}
+.logo-wrap{
+  width:40px;height:40px;border-radius:13px;
+  background:linear-gradient(140deg,var(--blue),var(--blue-dark));
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(0,87,168,0.38);
+}
+.logo-wrap svg{width:24px;height:24px}
+.h-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--txt-dark);letter-spacing:-0.3px;line-height:1.1}
+.h-sub{font-size:11px;color:var(--txt-soft);margin-top:1px}
+.badge{
+  margin-left:auto;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  color:white;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;
+  padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;
+  box-shadow:0 2px 12px rgba(0,87,168,0.32);
+  transition:transform .15s,box-shadow .15s;
+}
+.badge:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(0,87,168,0.42)}
+
+/* STEPS */
+.steps-bar{
+  background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  padding:11px 22px;display:flex;align-items:center;
+  position:relative;z-index:100;
+}
+.sdot{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;font-family:'Sora',sans-serif;
+  border:2px solid var(--border);background:var(--glass-in);color:var(--txt-soft);
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(8px);
+}
+.sdot.active{background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-color:var(--blue);color:#fff;box-shadow:0 0 0 5px var(--blue-light),0 4px 14px var(--blue-glow)}
+.sdot.done{background:linear-gradient(135deg,var(--ok),#0a5c36);border-color:var(--ok);color:#fff;box-shadow:0 2px 8px var(--ok-bg)}
+.sline{flex:1;height:2px;background:var(--border);margin:0 5px;border-radius:2px;transition:background .4s}
+.sline.done{background:var(--ok)}
+
+/* MAIN */
+.main{padding:18px 16px 110px;position:relative;z-index:1}
+
+/* CARD */
+.card{
+  background:var(--glass-card);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:20px;margin-bottom:14px;
+  box-shadow:0 4px 28px rgba(0,87,168,0.07),0 1px 0 rgba(255,255,255,.9) inset;
+  animation:up .32s cubic-bezier(.22,1,.36,1);
+}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+.clabel{
+  font-family:'Sora',sans-serif;font-size:11px;font-weight:700;
+  color:var(--blue);text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.clabel .cn{
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  color:#fff;font-size:10px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px var(--blue-glow);flex-shrink:0;
+}
+
+/* BANNER */
+.banner{
+  background:linear-gradient(135deg,rgba(0,87,168,.07),rgba(0,87,168,.03));
+  border:1px solid var(--blue-mid);border-radius:var(--rsm);
+  padding:11px 13px;display:flex;gap:9px;align-items:flex-start;margin-bottom:16px;
+}
+.banner svg{color:var(--blue);flex-shrink:0;margin-top:1px}
+.banner p{font-size:12px;color:var(--txt-dark);line-height:1.55}
+.banner strong{color:var(--blue);font-weight:600}
+
+/* SCANNER */
+.scan-zone{
+  border:2px dashed var(--border);border-radius:var(--rsm);overflow:hidden;
+  position:relative;background:rgba(225,240,255,.55);
+  min-height:195px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;transition:all .22s;
+}
+.scan-zone:hover{border-color:var(--blue);background:rgba(0,87,168,.05)}
+.scan-zone.active{border-color:var(--blue);border-style:solid;background:#000}
+.scan-idle{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 20px}
+.scan-idle svg{color:var(--blue);opacity:.75}
+.scan-idle p{font-size:13px;color:var(--txt-mid);text-align:center;line-height:1.5}
+.scan-idle strong{color:var(--txt-dark)}
+.scan-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.scan-frame{
+  width:215px;height:108px;border:2px solid rgba(0,130,255,.75);
+  border-radius:8px;position:relative;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.38);
+}
+.scan-frame::after{
+  content:'';position:absolute;left:0;width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,140,255,1),transparent);
+  animation:sweep 1.7s ease-in-out infinite;
+}
+@keyframes sweep{0%{top:10%;opacity:.5}50%{top:88%;opacity:1}100%{top:10%;opacity:.5}}
+.scan-frame::before{
+  content:'';position:absolute;inset:-2px;border-radius:8px;
+  background:
+    linear-gradient(var(--blue),var(--blue)) top left/16px 3px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) top left/3px 16px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) top right/16px 3px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) top right/3px 16px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) bottom left/16px 3px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) bottom left/3px 16px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) bottom right/16px 3px no-repeat,
+    linear-gradient(var(--blue),var(--blue)) bottom right/3px 16px no-repeat;
+}
+
+/* EAN result */
+.ean-result{
+  display:none;align-items:center;gap:11px;
+  padding:12px 14px;background:var(--ok-bg);
+  border:1px solid rgba(14,124,74,.22);border-radius:var(--rsm);
+  margin-top:12px;animation:up .28s ease;
+}
+.ean-result.show{display:flex}
+.ean-result .icon{color:var(--ok);flex-shrink:0}
+.ean-info{flex:1;min-width:0}
+.ean-code{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--ok);letter-spacing:1.2px}
+.ean-sub{font-size:11px;color:var(--txt-soft);margin-top:1px}
+.btn-retry{
+  background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:var(--rxs);
+  padding:5px 10px;font-size:11px;color:var(--txt-mid);cursor:pointer;
+  font-family:'DM Sans',sans-serif;backdrop-filter:blur(8px);transition:all .18s;
+}
+.btn-retry:hover{background:#fff}
+
+/* divider label */
+.dvlabel{text-align:center;position:relative;margin:16px 0 14px}
+.dvlabel::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--border)}
+.dvlabel span{position:relative;background:var(--glass-card);padding:0 10px;font-size:11px;font-weight:600;color:var(--txt-soft);font-family:'Sora',sans-serif;text-transform:uppercase;letter-spacing:.6px}
+
+/* manual */
+.manual-row{display:flex;gap:8px;align-items:center}
+.manual-row input{
+  flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--rsm);
+  font-size:14px;font-family:'Sora',sans-serif;letter-spacing:1px;
+  color:var(--txt-dark);background:var(--glass-in);outline:none;
+  backdrop-filter:blur(10px);transition:all .2s;
+}
+.manual-row input:focus{border-color:var(--blue);background:rgba(255,255,255,.92);box-shadow:0 0 0 3px var(--blue-light)}
+.btn-search{
+  padding:12px 15px;background:var(--txt-dark);color:#fff;border:none;
+  border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'Sora',sans-serif;white-space:nowrap;transition:opacity .18s;
+}
+.btn-search:hover{opacity:.82}
+
+/* FIELD */
+.field{margin-bottom:14px}
+.field>label{
+  display:block;font-size:11px;font-weight:700;font-family:'Sora',sans-serif;
+  color:var(--txt-soft);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;
+}
+.sw{position:relative}
+.sw::after{
+  content:'';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:6px solid var(--txt-soft);pointer-events:none;
+}
+.sw select{
+  width:100%;padding:13px 36px 13px 14px;border:1.5px solid var(--border);border-radius:var(--rsm);
+  font-size:14px;font-family:'DM Sans',sans-serif;color:var(--txt-dark);
+  background:var(--glass-in);backdrop-filter:blur(10px);
+  outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;transition:all .2s;
+}
+.sw select:focus{border-color:var(--blue);background:rgba(255,255,255,.92);box-shadow:0 0 0 3px var(--blue-light)}
+.sw select:disabled{opacity:.42;cursor:not-allowed}
+
+/* STEPPER */
+.stepper{
+  display:flex;align-items:center;
+  border:1.5px solid var(--border);border-radius:var(--rsm);overflow:hidden;
+  background:var(--glass-in);backdrop-filter:blur(10px);
+}
+.stepper button{
+  width:58px;height:58px;border:none;background:transparent;
+  font-size:26px;color:var(--blue);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;flex-shrink:0;font-weight:300;
+}
+.stepper button:active{background:var(--blue-light)}
+.stepper input{
+  flex:1;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);
+  text-align:center;font-size:26px;font-weight:700;font-family:'Sora',sans-serif;
+  color:var(--txt-dark);background:rgba(255,255,255,.78);outline:none;padding:0;height:58px;
+}
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* FECHA GRID — order: Día / Mes / Año */
+.fgrid{display:grid;grid-template-columns:1fr 1.75fr 1fr;gap:10px}
+.fcol{display:flex;flex-direction:column;gap:5px}
+.flabel{
+  font-size:10px;font-weight:700;font-family:'Sora',sans-serif;
+  text-transform:uppercase;letter-spacing:.6px;color:var(--txt-soft);
+  text-align:center;
+}
+.fcol .sw select{
+  padding:13px 26px 13px 8px;
+  font-size:14px;font-family:'Sora',sans-serif;font-weight:600;
+  text-align:center;color:var(--txt-dark);
+}
+
+/* BUTTONS */
+.btn-primary{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  color:#fff;border:none;border-radius:var(--rsm);
+  font-size:15px;font-weight:700;font-family:'Sora',sans-serif;
+  cursor:pointer;letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 18px rgba(0,87,168,.28);transition:all .2s;
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,87,168,.36)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.36;cursor:not-allowed;transform:none;box-shadow:none}
+
+.btn-export{
+  width:100%;padding:15px;background:var(--txt-dark);color:#fff;
+  border:none;border-radius:var(--rsm);font-size:14px;font-weight:700;
+  font-family:'Sora',sans-serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:opacity .2s;box-shadow:0 4px 14px rgba(10,31,58,.2);
+}
+.btn-export:hover{opacity:.82}
+.btn-export:disabled{opacity:.34;cursor:not-allowed}
+
+/* BOTTOM NAV */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--glass);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  border-top:1px solid var(--border);
+  display:flex;gap:10px;padding:12px 16px 26px;
+  box-shadow:0 -4px 24px rgba(0,87,168,.08);z-index:100;
+}
+.nbtn{
+  flex:1;padding:13px;border-radius:var(--rsm);
+  font-size:14px;font-weight:700;font-family:'Sora',sans-serif;
+  cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;
+}
+.nbtn.p{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;box-shadow:0 4px 16px rgba(0,87,168,.28)}
+.nbtn.p:hover{opacity:.88;transform:translateY(-1px)}
+.nbtn.s{background:var(--glass-in);color:var(--txt-mid);border:1.5px solid var(--border);backdrop-filter:blur(10px)}
+.nbtn.s:hover{background:rgba(255,255,255,.86)}
+
+/* SCREENS */
+.screen{display:none}.screen.active{display:block}
+
+/* TABS */
+.tnav{
+  display:flex;background:var(--glass-in);border:1px solid var(--border);
+  border-radius:var(--rsm);padding:3px;margin-bottom:18px;
+  backdrop-filter:blur(12px);
+}
+.tbtn{
+  flex:1;padding:9px 6px;border:none;background:transparent;border-radius:var(--rxs);
+  font-size:12px;font-weight:600;color:var(--txt-soft);cursor:pointer;
+  font-family:'Sora',sans-serif;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.tbtn.active{background:#fff;color:var(--txt-dark);box-shadow:0 1px 6px rgba(0,87,168,.1)}
+.tpill{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:2px}
+
+/* RECORDS */
+.rec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.rec-hdr h3{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--txt-dark)}
+.rec-pill{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;font-size:11px;font-weight:700;font-family:'Sora',sans-serif;padding:3px 10px;border-radius:20px}
+.rec-item{
+  background:var(--glass-card);border:1px solid var(--border);border-radius:var(--rsm);
+  padding:13px 14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;
+  backdrop-filter:blur(16px);box-shadow:0 2px 12px rgba(0,87,168,.06);animation:up .25s ease;
+}
+.rn{
+  width:28px;height:28px;border-radius:50%;background:var(--blue-light);
+  border:1px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--blue);font-family:'Sora',sans-serif;flex-shrink:0;
+}
+.ri{flex:1;min-width:0}
+.ri-ean{font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:var(--blue);letter-spacing:1px}
+.ri-pdv{font-size:12px;color:var(--txt-dark);font-weight:500;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-meta{font-size:11px;color:var(--txt-soft);margin-top:2px}
+
+.empty{text-align:center;padding:52px 20px;color:var(--txt-soft)}
+.empty svg{margin-bottom:12px;opacity:.38}
+.empty p{font-size:13px;line-height:1.6}
+
+/* TOAST */
+.toast{
+  position:fixed;top:80px;left:50%;
+  transform:translateX(-50%) translateY(-8px);
+  padding:10px 18px;border-radius:24px;font-size:13px;font-weight:500;
+  background:var(--txt-dark);color:#fff;opacity:0;transition:all .28s;
+  z-index:999;white-space:nowrap;font-family:'DM Sans',sans-serif;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--ok)}
+.toast.err{background:#C0392B}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M12 3C9.2 3 6.8 5.4 6.8 8.5C6.8 13.3 12 21 12 21S17.2 13.3 17.2 8.5C17.2 5.4 14.8 3 12 3Z" fill="white"/>
+      <circle cx="12" cy="8.5" r="2.1" fill="rgba(0,87,168,.45)"/>
+    </svg>
+  </div>
+  <div>
+    <div class="h-title">Alpina Regional Costa</div>
+    <div class="h-sub">Control de Fechas Cortas — Éxito</div>
+  </div>
+  <div class="badge" id="rec-badge" onclick="goRecords()">0 reg.</div>
+</header>
+
+<div class="steps-bar" id="steps-bar">
+  <div class="sdot active" id="dot-1">1</div>
+  <div class="sline" id="line-1"></div>
+  <div class="sdot" id="dot-2">2</div>
+  <div class="sline" id="line-2"></div>
+  <div class="sdot" id="dot-3">3</div>
+  <div class="sline" id="line-3"></div>
+  <div class="sdot" id="dot-4">4</div>
+</div>
+
+<div class="main">
+
+  <!-- STEP 1 -->
+  <div class="screen active" id="screen-1">
+    <div class="card">
+      <div class="clabel"><div class="cn">1</div>Escanear código de barras</div>
+      <div class="banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>Apunta la cámara al <strong>código de barras</strong> del producto con fecha corta para capturar el EAN automáticamente.</p>
+      </div>
+      <div class="scan-zone" id="scan-zone" onclick="startScan()">
+        <div class="scan-idle" id="scan-idle">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+            <line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="9" x2="7" y2="15"/>
+            <line x1="10" y1="9" x2="10" y2="15"/><line x1="13" y1="9" x2="13" y2="15"/><line x1="17" y1="9" x2="17" y2="15"/>
+          </svg>
+          <p><strong>Toca para activar la cámara</strong><br>y escanear el código de barras</p>
+        </div>
+        <div id="qgt" style="width:100%"></div>
+        <div class="scan-ov" id="scan-ov" style="display:none"><div class="scan-frame"></div></div>
+      </div>
+      <div class="ean-result" id="ean-result">
+        <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div class="ean-info">
+          <div class="ean-code" id="ean-disp">—</div>
+          <div class="ean-sub">EAN capturado correctamente</div>
+        </div>
+        <button class="btn-retry" onclick="retryScan()">↺ Repetir</button>
+      </div>
+      <div class="dvlabel"><span>o ingresa manualmente</span></div>
+      <div class="manual-row">
+        <input type="text" id="ean-in" placeholder="7702001..." maxlength="14" inputmode="numeric">
+        <button class="btn-search" onclick="manualEAN()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="screen" id="screen-2">
+    <div class="card">
+      <div class="clabel"><div class="cn">2</div>Ubicación del reporte</div>
+      <div class="field">
+        <label>Ciudad</label>
+        <div class="sw"><select id="sel-ciudad" onchange="filterPDVs()"><option value="">— Selecciona tu ciudad —</option></select></div>
+      </div>
+      <div class="field">
+        <label>Punto de Venta</label>
+        <div class="sw"><select id="sel-pdv" disabled><option value="">— Primero selecciona ciudad —</option></select></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="screen" id="screen-3">
+    <div class="card">
+      <div class="clabel"><div class="cn">3</div>Inventario en tienda</div>
+      <div class="field">
+        <label>Unidades en inventario</label>
+        <div class="stepper">
+          <button onclick="chQty(-1)" type="button">−</button>
+          <input type="number" id="qty" value="0" min="0" max="9999" inputmode="numeric">
+          <button onclick="chQty(1)" type="button">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 — Día / Mes / Año -->
+  <div class="screen" id="screen-4">
+    <div class="card">
+      <div class="clabel"><div class="cn">4</div>Fecha de vencimiento</div>
+      <div class="banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <p>Selecciona la fecha impresa en el empaque: <strong>Día · Mes · Año</strong></p>
+      </div>
+      <div class="fgrid">
+        <!-- DÍA -->
+        <div class="fcol">
+          <div class="flabel">Día</div>
+          <div class="sw"><select id="sel-dia"><option value="">Día</option></select></div>
+        </div>
+        <!-- MES -->
+        <div class="fcol">
+          <div class="flabel">Mes</div>
+          <div class="sw">
+            <select id="sel-mes" onchange="updateDias()">
+              <option value="">Mes</option>
+              <option value="1">Enero</option><option value="2">Febrero</option>
+              <option value="3">Marzo</option><option value="4">Abril</option>
+              <option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option>
+              <option value="9">Septiembre</option><option value="10">Octubre</option>
+              <option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </div>
+        </div>
+        <!-- AÑO -->
+        <div class="fcol">
+          <div class="flabel">Año</div>
+          <div class="sw">
+            <select id="sel-anio">
+              <option value="2026" selected>2026</option>
+              <option value="2027">2027</option><option value="2028">2028</option>
+              <option value="2029">2029</option><option value="2030">2030</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMACIÓN -->
+  <div class="screen" id="screen-ok">
+    <div class="card" style="text-align:center;padding:32px 20px;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--ok-bg);border:2px solid rgba(14,124,74,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pop .5s cubic-bezier(.34,1.56,.64,1);">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h2 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--txt-dark);margin-bottom:8px;">¡Producto registrado!</h2>
+      <p style="font-size:13px;color:var(--txt-soft);line-height:1.6;margin-bottom:6px;" id="ok-desc">—</p>
+      <p style="font-size:12px;color:var(--txt-soft);margin-bottom:28px;" id="ok-pdv">—</p>
+
+      <button class="btn-primary" onclick="backToNew()" style="margin-bottom:12px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Registrar otro producto próximo a vencer
+      </button>
+
+      <button onclick="goRecords()" style="width:100%;padding:13px;background:transparent;border:1.5px solid var(--border);border-radius:var(--rsm);font-size:13px;font-weight:600;font-family:'Sora',sans-serif;color:var(--txt-mid);cursor:pointer;transition:all .18s;backdrop-filter:blur(8px);">
+        Ver todos los registros →
+      </button>
+    </div>
+  </div>
+
+  <!-- REGISTROS -->
+  <div class="screen" id="screen-records">
+    <div class="tnav">
+      <button class="tbtn active" id="tab-n" onclick="switchTab('n')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuevo registro
+      </button>
+      <button class="tbtn" id="tab-l" onclick="switchTab('l')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Registros <span class="tpill" id="tab-count">0</span>
+      </button>
+    </div>
+    <div id="tnc"></div>
+    <div id="tlc" style="display:none">
+      <div class="rec-hdr">
+        <h3>Registros del día</h3>
+        <span class="rec-pill" id="rec-count">0</span>
+      </div>
+      <div id="rec-list">
+        <div class="empty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><p>No hay registros aún.<br>Agrega el primero.</p></div>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn-export" id="btn-exp" onclick="exportCSV()" disabled>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar CSV para Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="bnav" id="bnav">
+  <button class="nbtn s" id="btn-back" onclick="goBack()" style="display:none">← Atrás</button>
+  <button class="nbtn p" id="btn-next" onclick="goNext()">Siguiente →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PRODUCTOS = {"7702001115143": "Lch Fnsse + Fib Bol 1100Ml", "7702001176557": "Prv Parmesano 250g Gts Crema Leche 200ml", "7702001176540": "Pr Griego Vainilla 500g Gts Granola", "7702001176519": "Bon Yurt Morenitas 174g", "7702001176410": "Pleg Areq 220Gr+Obleas", "7702001176403": "Pr Rit Gratitud Areq 220g Gal Noel 120 g", "7702001176397": "Pr Ritual Renacer Holan 250g Areq 220g", "7702001176083": "Boggy Premio Mochisaurios Vaso 108g", "7702001175956": "Alpinette Navidad Natilla 140g", "7702001175758": "Kefir Ftos Bosq 1000g", "7702001175741": "Kefir Ftos Bosq Bot 240g", "7702001175666": "Mplx4 Mini Bon Yurt FrootLoops", "7702001175659": "Mini Bon Yurt Froot Loops 93g", "7702001175642": "Kefir Nat Bot 1000g", "7702001175635": "Kefir Nat Bot 240g", "7702001175451": "Bon Yurt Buuumbastico 170g", "7702001175383": "Q Argovia Cuna 150g", "2953443000008": "Q Argovia Torta 2.8Kg Aprox", "7702001174973": "Pr 4X5 Leche Desl Caja 1L", "7702001174942": "Pr Bts7D BYZu YogoFre AveOrg BogFr AlpCj", "7702001174881": "Pr+1Parme250g+1Saba91g", "7702001173860": "Pr Rit Vida Nueva Areq 220g Gal Noel 150", "7702001173853": "Pr Ritual Esperanza Holan 250g Areq 220g", "7702001173815": "Yogurt Griego Triple Zero Finesse 1000g", "7702001173631": "Bon Yurt Mini Chips Navidad 170g", "7702001173532": "Mplx4 Griego Triple Zero Finesse 150g", "7702001173525": "Yogurt Griego Triple Zero Finesse 500g", "7702001173518": "Yogurt Griego Triple Zero Finesse 150g", "7702001173266": "Quesito Vaso 250g", "7702001173174": "Yog Griego Natural Cereal 159g", "7702001172962": "Boggy Prem Misterio Vaso 108g", "7702001172955": "Yogo Premio Misterio Bot 150g", "7702001172948": "Yogo Misterio Vaso 150g", "7702001172702": "Alpinito Misterio 45g", "7702001172696": "Snack Ques Jalap Limon Pimien Deshidratado 23g", "7702001172689": "Snack Ques Chile Pimien Deshidratado 23g", "7702001171750": "Mpl X4 Griego Vainilla 150g", "7702001171699": "Bon Yurt Chocosnack 173g", "7702001171576": "Pr BY Econopack 2 Zuc 170G 1 Chogoz 171G", "7702001171569": "Pr 2X3 Yogo Multisab 1000g", "7702001171187": "Pr Griego Nat 500g Gts Granola Coco", "7702001171125": "Yogurt Original Melo Botella 240g", "7702001171118": "Yogurt Original Fresa Botella 240g", "7702001170821": "Griego Vainilla 150g", "7702001170678": "Griego Bebible Vainilla 1000g", "7702001170661": "Griego Bebible Vainilla 240g", "7702001170654": "Griego Bebible Natural 1000g", "7702001170647": "Griego Bebible Natural 240g", "7702001170630": "Queso Camembert Bloque 180g", "7702001170449": "Mpl x3 Gelatina Ftos Rojos Finesse 2492", "7702001170357": "Gelatina Ftos Rojos Finesse 108g 2492", "7702001170135": "Griego Vainilla 1000gr", "7702001170128": "Griego Vainilla 500gr", "7702001170098": "Pr Termo Bts Yogo 3Frsa 3Mel 2Mor", "7702001170005": "Bon Yurt Melos 165gr", "7702001169955": "Q Parmesano Rallado Bolsa 380G", "7702001169832": "Q Crem Finesse Vaso 200g 2492", "7702001169740": "Mpl X8 3 Black + 3 Chocogozzo + 2 Piazza", "7702001169733": "Mpl X6 3 Zucaritas + 3 Piazza", "7702001169726": "Mpl X6 3 Zucaritas + 3 Black", "7702001169696": "Q Tilsi Nat Cuna 125g", "7702001169689": "Q Tilsi Fna Hba Cuna 125g", "7702001169672": "Q Tilsi Ahum Cuna 125g", "7702001169627": "Q Guy Cuna 125g", "7702001169337": "Yog Griego Saborizado Coco 150g", "7702001169320": "MplX4 Yog Griego Saborizado Mezcl 150g", "7702001169313": "Yog Griego Saborizado Mandarina 150g", "7702001169306": "Mpl 5X6 Soka Tetra Personal 200ml", "7702001169290": "Mpl 10X12 Soka Tetra Personal 200 Ml", "7702001169221": "Kumis Orig Bot 240g", "7702001168934": "Soka Lulo Botella 410ml", "7702001168927": "Soka Fresa Tetra 200Ml", "7702001168903": "Soka Mango Tetra 200Ml", "7702001168620": "Snack Queso Tilsit Finas Hierbas 23g", "7702001168484": "Yogo Fre Bol 700g", "7702001167876": "PR 4X5 Griego Natural Vaso 150G", "7702001167692": "Queso Mezcla Iberico 150gr", "7702001167685": "Queso Manchego 150gr", "7702001167678": "Queso De Oveja 150 gr", "7702001166077": "Mini Bon Yurt Chocoramo 96g", "7702001165919": "Bon Yurt Chocoramo 170g", "7702001165094": "Lata Arequipe 220gr+Obleas", "7702001164530": "Esparcible Origen Vegetal Sabor Marañón Y Finas Hierbas", "7702001164523": "Esparcible Origen Vegetal Sabor Marañón", "7702001164288": "Q Fond Fina Hba 400G", "7702001164271": "Q Fond Original 400G", "7702001164226": "Mpl X4 Und Alpin Choc Caj 200ml", "7702001164141": "Queso Mozarella Rallado 300G", "7702001163984": "Mplx4 Yogurt Griego Multisabor Cama De F", "7702001163960": "Mplx4 Yog Griego Natural 150G", "7702001163953": "Yog Griego Cama De Fruta Mora Arand Cere", "7702001163946": "Yog Griego Cama De Fruta Mora Arand150G", "7702001163939": "Yog Griego Cama De Fruta Fresa 150G", "7702001163892": "Yogurt Griego Natural 1000G", "7702001163885": "Yog Griego Natural 500G", "7702001163878": "Yog Griego Natural 150G", "7702001163649": "Yog Ori Cafe Juan Valdez Vaso 150G", "7702001163328": "Form Infa Nutrimax Et3 800g", "7702001163311": "Form Infa Nutrimax Et2 800g", "7702001163304": "Form Infa Nutrimax Et2 400g", "7702001163298": "Form Infa Nutrimax Et1 800g", "7702001163281": "Form Infa Nutrimax Et1 400g", "7702001163212": "Mplx4 Avena Original Botella 280G", "7702001163205": "Avena Original Botella 280G", "7702001163083": "Avena Original Caja 1000 G", "7702001163076": "Mplx6 Avena Canela Bolsa 200 G", "7702001163052": "Mplx6 Avena Original Bolsa 200 G", "7702001162710": "Mplx4 Yox Mentalis Manz Ver+Frut Roj", "7702001162567": "Mplx8 Yox Mentalis Manz Ver+ Frutos Roj", "7702001162550": "Yox Mentalis Frut Roj Bot 100", "7702001162505": "Mini Bon Yurt Melos 93G", "7702001161102": "Crema De Leche Semi Entera Bolsa 200Ml", "7702001161096": "Crema De Leche Semi Entera Caja 200G", "7702001161072": "Crema De Leche Semi Entera 1.1L", "7702001161058": "Mplx3 Bon Yurt Zucaritas 170gr", "7702001160068": "Snack Ques Sopo Deshidratado 23G", "7702001160051": "Snack Ques Parm Deshidratado 23G", "7702001160044": "Snack Ques Hol Deshidratado 23G", "7702001160020": "Mplx3 Snack Queso Deshidratado Surtido", "7702001159994": "Pr 35X45 Queso Fnss Taj", "7702001159376": "Soka Mand Bot 410 Ml", "7702001159369": "Soka Mgo Bot 410 Ml", "7702001159345": "Soka Mara Bot 410 Ml", "7702001158928": "Mplx3 Queso Pera 38G", "7702001158904": "Mplx6 Queso Pera 38G", "7702001158881": "Queso Pera Individual 38G", "7702001158768": "Mplx4 Avena Finesse Botella 280Gr", "7702001158645": "Avena Finesse Botella 280Gr", "7702001158522": "Griego Veg Gulupa 150G", "7702001158225": "Alpin Botella Chocolate 300Ml", "7702001158171": "Mplx4 Alpin Botella Chocolate 300Ml", "7702001158072": "Frutto Naranja 100 Porciento 1 L", "7702001157631": "Mplx4 Mini Bon Yurt Trolli 108G", "7702001157440": "Mini Bon Yurt Trolli 108G", "7702001157280": "Griego Veg Pina Coco 150G", "7702001157273": "Griego Veg Mora 150G", "7702001157013": "Mplx8 Yox Multisab Sin Azucar", "7702001156382": "Q Holandes Cubo 250 G", "7702001156047": "Q Gruyere Taj 204 G", "7702001156030": "Q Tilsi Ahum Taj 204 G", "7702001155842": "Lch Entera Bol 1.3L", "7702001155644": "Mplx6 Compota Baby Gu Multisab 113G", "7702001155378": "Yogo Cuchareable Melo 100G", "7702001155361": "Yogo Cuchareable Fresa 100G", "7702001155309": "Mplx4 Yogurt Finesse Cereal 170G", "7702001155293": "Yogurt Finesse Nat Cereal 170G", "7702001155286": "Yogurt Finesse Melo Bot 1700G", "7702001155279": "Yogurt Finesse Nat Bot 1700G", "7702001155262": "Yogurt Finesse Ftos Roj Bot 1700G", "7702001155255": "Yogurt Finesse Fresa Bot 1700G", "7702001155231": "Yogurt Finesse Mora Bot 1000G", "7702001155224": "Yogurt Finesse Melo Bot 1000G", "7702001155217": "Yogurt Finesse Fresa Bot 1000G", "7702001155200": "Yogurt Finesse Nat Bot 1000G", "7702001155187": "Mplx6 Yogurt Finesse 150G Fresa+Melo", "7702001155170": "Yogurt Finesse Ftos Roj Vaso 180G", "7702001155163": "Yogurt Finesse Mora Vaso 180G", "7702001155156": "Yogurt Finesse Melo Vaso 180G", "7702001155149": "Yogurt Finesse Fresa Vaso 180G", "7702001155132": "Yogurt Finesse Nat Vaso 180G", "7702001154579": "Mpl X4 Lech Semides Caj 1L", "7702001149209": "Mplx6 Bon Yurt Multisab 3 Chocog+3 Black", "7702001149063": "Mpl 6 Und Frutto Botella Trad", "7702001149032": "Mpl 3 Und Mpl Frutto Botella Trad", "7702001148837": "Arequipe 220Gr+Obleas", "7702001148615": "Yogurt Natural Vainilla Cereal 105G", "7702001148585": "Yogurt Natural Manzana 113G", "7702001148578": "Yogurt Natural Vainilla 113G", "7702001148561": "Yogurt Natural 113G", "7702001148523": "Compota Natural Frutas Mixtas 113G", "7702001148516": "Compota Natural Pera 113G", "7702001148509": "Compota Natural Mzna Mango 113G", "7702001148462": "Compota Natural Manzana 113G", "7702001147281": "Mplx3 Gelatina Ftos Rojos Finesse", "7702001146437": "Mpl X4 Lch Deslac Desc Caj 1L", "7702001146246": "Mplx2 Mini By Choccan Vaso 100G", "7702001145782": "Mpl X6 Und Lch Desl Bol 1.3L", "7702001145775": "Lch Desl Bol 1.3L", "7702001139811": "Pr Pack X 3 Frutto Pet Precio Espec Sp", "7702001134458": "Prl 25X30 Q Fnsse Taj 450g", "7702001134410": "Mpl10X7 Frutto Multsab Caj 200Ml", "7702001133628": "Quesito Alpina 375 Sp", "7702001133611": "Quesito Alpina 185Gr C Mod", "7702001132676": "Pr 5x6 Lch Desl 1.1 L Si", "7702001127269": "Q Sopo Cubo 250G", "7702001124763": "By Piazza 174G", "7702001122011": "Q Sopo Rall 100G", "7702001121786": "Q Fnsse 30 Taj 450G", "7702001121779": "Q Fnsse 15 Taj 239G", "7702001121762": "Q Mozar 25 Taj 400G", "7702001121755": "Q Mozar 15 Taj 240G", "7702001121748": "Q Saba 25 Taj 400G", "7702001121731": "Q Saba 15 Taj 240G", "7702001121625": "Pack X8 Bon Yurt", "7702001119882": "Q Gruy Cuna 250G", "7702001119875": "Q Gruy Cuna 180G", "7702001119868": "Tilsi Fna Hba Cuna 250G", "7702001119851": "Q Tilsi Fna Hba Cuna 180G", "7702001119844": "Q Tilsi Nat Cuna 250G", "7702001119837": "Q Tilsi Nat Cuna 180G", "7702001119820": "Q Tilsi Ahum Cuna 250G", "7702001119813": "Q Tilsi Ahum Cuna 180G", "7702001118168": "Alpin Fre Bol 180Ml", "7702001118151": "Alpin Choc Bol 180Ml", "7702001117611": "Pure Espinmgomanz Pouc 90G", "7702001117604": "Pure Manzzhria Pouc 90G", "7702001117277": "Mplx6 Yogo Bisab Caj 185Ml", "7702001117017": "Mpx4 Boggy Fre Vaso 108G", "7702001116577": "Mplx6 Alpin Fre Bol 180Ml", "7702001116560": "Mplx6 Alpin Choc Bol 180Ml", "7702001116553": "Mplx6 Alpin Multsab Bol 180Ml", "7702001116102": "Mplx6 Boggy Prem Multsab 108G", "7702001116089": "Boggy Prem Mor Vaso 108G", "7702001116072": "Boggy Prem Fre Vaso 108G", "7702001116065": "Boggy Prem Cza Vaso 108G", "7702001115488": "Beb Almend Caj 1L", "7702001115396": "Lch Actlfe Bol 900Ml", "7702001114856": "Yog Desl Fre Bol 900G", "7702001114849": "Yog Desl Melo Bol 900G", "7702001114054": "Lch Actlfe Caj 1L", "7702001113101": "Frutto Dzno Bot 300Ml", "7702001113095": "Frutto Pera Bot 300Ml", "7702001113088": "Frutto Manz Bot 300Ml", "7702001111503": "Q Saba 7 Taj 91g", "7702001110780": "Queso Snack Finesse X 6 Unid", "2953404000009": "Queso Sopo Torta Vendida Al Peso 4.8 Kg", "7702001106707": "Yogo Cer Nat Vaso 130G", "7702001106684": "Yogo Cer Fre Vaso 130G", "7702001106660": "Mpl X6 Und Yogo Cereal 130G", "7702001106325": "Mplx3 Alpinette Cza 140G", "7702001104635": "Mplx4 Mini By Choccan Vaso 100G", "7702001101573": "Mplx6 Rgn Cer Pita Vaso 150G", "7702001101481": "Mplx4 Avena Fnsse Vaso 250G", "7702001101474": "Mplx8 Yox Multsab Bot 100G", "7702001101467": "Mplx8 Yox Vlla Bot 100G", "7702001101450": "Mplx8 Yox Fre Bot 100G", "7702001100743": "Mplx4 By Chockri Vaso 169G", "7702001100736": "Mplx4 By Zuc Vaso 170G", "7702001100125": "Alpinito Frugta 90G X4Und", "7702001100118": "Alpinito Mor 90G X4Und", "7702001100101": "Alpinito Fre 90G X4Und", "7702001100095": "Mplx3 Alpinito Multsab 45G X4Und", "7702001100057": "Alpinito Fremor 45G X6Und", "7702001100040": "Alpinito Fremelo 45G X6Und", "7702001100033": "Alpinito Mor 45G X4Und", "7702001100026": "Alpinito Melo 45G X4Und", "7702001100019": "Alpinito Fre 45G X4Und", "7702001090297": "Mpl X3 Und Yogo Multisab 1000G", "7702001086498": "Bon Yurt Black 173G", "7702001086337": "Bon Yurt Chocgoz 171G", "7702001086054": "Bon Yurt Chocokr 169G", "7702001086023": "Bon Yurt Zuc 170G", "7702001084999": "Avena Fnsse Vaso 250G", "7702001084975": "Avena Fnsse Caj Litro", "7702001082131": "Arequipe Vaso 500G", "7702001082070": "Mplx24 Arequipe Vaso 50G", "7702001082018": "Arequipe Vaso 50G", "7702001081103": "Mplx10 Arequipe Vaso 50G", "7702001072026": "Crem Lch Fnsse Caj 200Ml", "7702001062263": "Alpinette Mor 140G", "7702001062218": "Alpinette Cza 140G", "7702001062195": "Alpinette Fre 140G", "7702001061402": "Yog Orig Frtroj Vaso 200G", "7702001055265": "Mplx6 Yogo Bisabor Bol 150g", "7702001054718": "Arequipe 220G", "7702001054121": "Mpl X4 Und Avena Desl Vaso 250G", "7702001054107": "Mplx4 Avena Orig Vaso 250G", "7702001053971": "Yog Orig. Arequipe Pasas 150g", "7702001053858": "Mpl X6 Und Lch Desl Decr Bol 1.1 L", "7702001053841": "Lch Desl Desc Bol 1.1L", "7702001050888": "Rgn Cer Pita Bot 1750G", "7702001050420": "Mpl X5 Und Yog Orig Vaso 150G", "7702001050352": "Mpl X6 Und Lch Desc Bol 1.1L", "7702001050208": "Mpl X6 Und Lch Baja Gras Bol 1.1L", "7702001050147": "Lch Desc Bol 1.1L", "7702001050130": "Lch Semidesc Bol 1.1L", "7702001049103": "A.L Rgn Meloc Vaso 150G", "7702001049097": "A.L Rgn Fre Vaso 150G", "7702001048656": "Kumis Orig Bot 1750G", "7702001048113": "Kumis Orig Bot 1000G", "7702001048106": "Kumis Orig Bol 1000G", "7702001048076": "Kumis Vaso 200G", "7702001047963": "Mplx6 Kumis Bol 150G", "7702001047949": "Kumis Orig Bol 150G", "7702001047680": "Yogo Melo Vaso 150G", "7702001047666": "Yogo Fre Vaso 150G", "7702001047604": "Mplx4 Yogo Multsab Vaso 150G", "7702001047567": "Yogo Mor Bol 150G", "7702001047437": "Mpl X8 Und Yogo Multsab Bol 150G", "7702001047406": "Yog Orig Melo Bol 900G", "7702001047390": "Yog Orig Fre Bol 900G", "7702001047178": "Yogo Premio Mor Bot 150G", "7702001047161": "Yogo Premio Meloc Bot 150G", "7702001047154": "Yogo Premio Fre Bot 150G", "7702001047000": "Mplx6 Rgn Tzos Bisab Vaso 150G", "7702001046522": "Yog Orig Mor Bot 1750G", "7702001046515": "Yog Orig Melo Bot 1750G", "7702001046508": "Yog Orig Fre Bot 1750G", "7702001046423": "Yogo Meloc Bol 1000G", "7702001046416": "Yogo Mor Bol 1000G", "7702001046409": "Yogo Fre Bol 1000G", "7702001045556": "Lch Desl Bol 1.1L", "7702001045501": "Lch Desl Bol 900Ml", "7702001045310": "Lch Desl Caj 1L", "7702001045280": "Lch Entera Bol 900Ml", "7702001045204": "Lch Entera Caj 200Ml", "7702001045075": "Lch Desl Desc Caj 1L", "7702001045051": "Lch Entera Caj 1L", "7702001044924": "Alpin Choc Bol 200Ml", "7702001044726": "Avena Desl Vaso 250G", "7702001044542": "Avena Can Vaso 250G", "7702001044504": "Avena Orig Vaso 250G", "7702001044481": "Lch Desl Caj 200Ml", "7702001044467": "Alpin Vlla Caj 200Ml", "7702001044450": "Alpin Fre Caj 200Ml", "7702001044306": "Alpin Choc Caj 200Ml", "7702001044191": "Yog Orig Guana Vaso 200G", "7702001044160": "Yog Orig Mor Vaso 200G", "7702001044122": "Yog Orig Melo Vaso 200G", "7702001044115": "Yog Orig Fre Vaso 200G", "7702001043941": "Yog Orig Melo Bot 1000G", "7702001043934": "Yog Orig Fre Bot 1000G", "7702001043361": "Lch Semidesc Caj 1L", "7702001043064": "Mpl X12 Und Yox Multisab 100G", "7702001042050": "Yog Orig Mora Vaso 150G", "7702001042029": "Yog Orig Meloc Vaso 150G", "7702001042012": "Yog Orig Fre Vaso 150G", "7702001042005": "Yox Meloc Bot 100G", "7702001041985": "Rgn Tzos Fre Bot 1000g", "7702001041978": "Mplx4 Yox Multsab Bot 100G", "7702001041961": "Yox Multfrt Bot 100G", "7702001041954": "Rgn Tzos Fre Bot 1750G", "7702001041947": "Yox Vlla Bot 100G", "7702001041923": "Yox Fre Bot 100G", "7702001041565": "Yog Desl Melo Bot 1000G", "7702001041558": "Yog Desl Fre Bot 1000G", "7702001041411": "Mpl X6 Und Lch Entera Bol 1.1L", "7702001041404": "Lch Entera Bol 1.1L", "7702001040803": "Alpin Caja Cookies And Cream 200 Ml", "7702001029785": "Mpl X4 Und A.L Rgn Tzos Multsab Vaso 150", "7702001029723": "Mpl X6 Und Alpin Choc Caj 200Ml", "7702001029716": "Mpl X6 Und Lch Desl Bol 1.1L", "7702001028771": "Mpl X6 Und Alpin Multsab Caj 200Ml", "7702001028719": "Mplx6 Lch Ente Bol 900Ml", "7702001028177": "Mplx6 Fruper Caj 200Ml", "7702001027576": "Mpl X4 Und Lch Desl Caj 1L", "7702001026951": "Mplx4 Kumis Vaso 150G", "7702001025015": "Mpl X4 Und Lch Entera Caj 1L", "7702001024025": "Nectar Frutto Clas Dzno Caj 200Ml", "7702001024018": "Nectar Frutto Clasico Manz Caj 200Ml", "7702001024001": "Nectar Frutto Clas Pera Caj 200Ml", "7702001023523": "Frutto Dzno Caj 1L", "7702001023516": "Frutto Pera Caj 1L", "7702001023509": "Frutto Manz Caj 1L", "7702001020393": "Mquilla Sal 250G", "7702001020355": "Mquilla Sal 125G", "7702001020133": "Mquilla Nosal 250G", "7702001020096": "Mquilla Nosal 125G", "7702001019588": "Mpl X4 Und Yogo Premio Bot 150G", "7702001018444": "Q Fnsse Bloq 300G", "7702001018437": "Q Fnsse Bloq 1Kg", "7702001018178": "Q Americ Bloq 500G", "7702001016341": "Q Mozar Bloq 1Kg", "2959226000005": "Queso Finesse Bajo En Grasa Bloque 3 Kg", "2959211000003": "Queso Campesino Bloque 3 Kg", "7702001016068": "Q Campe Bloq 250G", "7702001015658": "Q Crem Fnsse Vaso 200G", "2959212000002": "Q Mozar Bloq 3Kg Prox", "7702001015603": "Q Mozar Bloq 250G", "7702001014552": "Q Brie 135G", "2959209000008": "Queso Gruyere Rueda 31 Kg", "2959208000009": "Emmental Bloque 40 Kg", "2959293000007": "Cuna Queso Emmental 180 Gr", "2959207000000": "Queso Tilsit Ahumado Rueda 4 2 Kg", "2959206000001": "Q Tilsit Nat Rda 4 2 Kg", "7702001014125": "Q Camem 120G", "2959292000008": "Cuna Queso Azul 180 Gr", "2959205000002": "Queso Azul Rueda 4 1 Kg", "2959224000007": "Queso Parmesano Rueda 4 6 Kg", "7702001012138": "Q Parme Rall Bol 500G", "7702001012084": "Q Parme Rall Bol 250G", "7702001012053": "Q Parme Rall Bol 100G", "7702001012022": "Q Parme Rall Bol 40G", "7702001011452": "Q Holan 15 Taj 282G", "7702001011315": "Q Cremosino Vaso 380G", "7702001011308": "Q Cremosino Vaso 200G", "2959274000002": "Queso Provolone Bloque 2 6 Kg", "2959240000005": "Queso Tilsit Finas Hierbas Rueda 4 2 Kg", "7702001010622": "Q Holan Celeb 750g", "2959228000003": "Queso Holandes Bloque 3 Kg", "7702001010578": "Q Holan Celeb 450G", "7702001010554": "Q Holan Celeb 250G", "2959237000001": "Queso Sabana Bloque 3 Kg", "7702001010486": "Q Holan 450G", "7702001010455": "Q Holan Bloq 250G"};
+
+const TIENDAS=[
+  {id:'8000000195',dep:41,  nombre:'EXITO BARRANQUILLA',                ciudad:'BARRANQUILLA'},
+  {id:'8000001124',dep:43,  nombre:'EXITO SINCELEJO',                    ciudad:'SINCELEJO'},
+  {id:'8000000735',dep:44,  nombre:'EXITO CARTAGENA',                    ciudad:'CARTAGENA'},
+  {id:'8000000191',dep:47,  nombre:'EXITO BARRANQUI.METROPOLITANO',      ciudad:'BARRANQUILLA'},
+  {id:'8000001132',dep:68,  nombre:'EXITO TOLU',                         ciudad:'TOLU VIEJO'},
+  {id:'8000000223',dep:171, nombre:'EXITO SOLEDAD',                      ciudad:'SOLEDAD'},
+  {id:'8000000753',dep:172, nombre:'EXITO MAGANGUE',                     ciudad:'MAGANGUE'},
+  {id:'8000000140',dep:250, nombre:'EXITO SAN BLAS BARRANQUILLA',        ciudad:'BARRANQUILLA'},
+  {id:'8000000705',dep:257, nombre:'EXITO EJECUTIVOS',                   ciudad:'CARTAGENA'},
+  {id:'8000000952',dep:258, nombre:'EXITO SANTA MARTA CENTRO',           ciudad:'SANTA MARTA'},
+  {id:'8000000949',dep:259, nombre:'EXITO LIBERTADOR',                   ciudad:'SANTA MARTA'},
+  {id:'8000000846',dep:262, nombre:'EXITO MONTERIA NORTE',               ciudad:'MONTERIA'},
+  {id:'8000001123',dep:264, nombre:'EXITO SINCELEJO CENTRO',             ciudad:'SINCELEJO'},
+  {id:'8000000822',dep:266, nombre:'EXITO VALLEDUPAR CENTRO',            ciudad:'VALLEDUPAR'},
+  {id:'8000000197',dep:280, nombre:'CARULLA VILLA COUNTRY',              ciudad:'BARRANQUILLA'},
+  {id:'8000000937',dep:385, nombre:'EXITO DUAL RIOHACHA',                ciudad:'RIOHACHA'},
+  {id:'8000011631',dep:4827,nombre:'CARULLA EXPRESS PRESENTE STA M',     ciudad:'BARRANQUILLA'},
+  {id:'8000011507',dep:4057,nombre:'EXITO CRESPO',                       ciudad:'CARTAGENA'},
+  {id:'8000013244',dep:4061,nombre:'EXITO ISLA VIA SAN LUIS',            ciudad:'SAN ANDRES'},
+  {id:'8000013245',dep:4062,nombre:'EXITO ISLA ZONA ROSA',               ciudad:'SAN ANDRES'},
+  {id:'8000013246',dep:4063,nombre:'EXITO SAN ANDRES 20 DE JULIO',       ciudad:'SAN ANDRES'},
+  {id:'8000013247',dep:4064,nombre:'EXITO ISLA AEROPUERTO',              ciudad:'SAN ANDRES'},
+  {id:'8000014844',dep:4084,nombre:'CARULLA MALAMBO CALLE 10',           ciudad:'MALAMBO'},
+  {id:'8000014876',dep:4093,nombre:'EXITO TURBACO',                      ciudad:'TURBACO'},
+  {id:'8000013093',dep:4437,nombre:'TURBO CARULLA LA CASTELLANA',        ciudad:'CARTAGENA'},
+  {id:'8000011528',dep:4442,nombre:'TURBO CARULLA MAR DEL NORTE',        ciudad:'CARTAGENA'},
+  {id:'8000010852',dep:4472,nombre:'TURBO CARULLA BOCAGRANDE',           ciudad:'CARTAGENA'},
+  {id:'8000010849',dep:4475,nombre:'TURBO CARULLA EL POBLADO BQUIL',     ciudad:'BARRANQUILLA'},
+  {id:'8000010848',dep:4476,nombre:'TURBO CARULLA EL PRADO BQUILLA',     ciudad:'BARRANQUILLA'},
+  {id:'8000010842',dep:4486,nombre:'TURBO CARULLA LAS COLINAS',          ciudad:'BARRANQUILLA'},
+  {id:'8000010839',dep:4489,nombre:'TURBO CARULLA MANGA',                ciudad:'CARTAGENA'},
+  {id:'8000010833',dep:4496,nombre:'TURBO CARULLA VILLA DE ANDALUC',     ciudad:'BARRANQUILLA'},
+  {id:'8000013881',dep:4576,nombre:'TURBO CARULLA BAVARIA',              ciudad:'SANTA MARTA'},
+  {id:'8000015796',dep:4585,nombre:'TURBO CARULLA RODADERO',             ciudad:'SANTA MARTA'},
+  {id:'8000015902',dep:4587,nombre:'TURBO CARULLA VALLEDUPAR',           ciudad:'VALLEDUPAR'},
+  {id:'8000012249',dep:4831,nombre:'CARULLA EXPRESS COSTA AZUL',         ciudad:'COVENAS'},
+  {id:'8000011862',dep:4832,nombre:'CARULLA EXPRESS CALLE 4TA',          ciudad:'CARTAGENA'},
+  {id:'8000012183',dep:4833,nombre:'CARULLA EXPRESS RODADERO SUR',       ciudad:'BARRANQUILLA'},
+  {id:'8000014816',dep:4837,nombre:'CARULLA EXPRESS CIELO MAR',          ciudad:'CARTAGENA'},
+  {id:'8000000745',dep:533, nombre:'CARULLA EXPRESS MANGA',              ciudad:'CARTAGENA'},
+  {id:'8000000201',dep:534, nombre:'CARULLA CALLE 86 B/QUILLA',          ciudad:'BARRANQUILLA'},
+  {id:'8000001072',dep:535, nombre:'CARULLA LA MINA',                    ciudad:'ALBANIA'},
+  {id:'8000000742',dep:538, nombre:'CARULLA SANTA LUCIA',                ciudad:'CARTAGENA'},
+  {id:'8000000744',dep:539, nombre:'CARULLA VILLA SUSANA',               ciudad:'CARTAGENA'},
+  {id:'8000000202',dep:599, nombre:'CARULLA CALLE 82',                   ciudad:'BARRANQUILLA'},
+  {id:'8000000957',dep:629, nombre:'CARULLA ARRECIFE',                   ciudad:'SANTA MARTA'},
+  {id:'8000000743',dep:647, nombre:'CARULLA RAMBLAS',                    ciudad:'CARTAGENA'},
+  {id:'8000000953',dep:665, nombre:'CARULLA ZAZUE',                      ciudad:'SANTA MARTA'},
+  {id:'8000012456',dep:4749,nombre:'SURTIMAYORISTA OLAYA FREDONIA',      ciudad:'CARTAGENA'},
+  {id:'8000012505',dep:4750,nombre:'SURTIMAYORISTA NEVADA',              ciudad:'VALLEDUPAR'},
+  {id:'8000012506',dep:4751,nombre:'SURTIMAYORISTA CODAZZI',             ciudad:'AGUSTIN CODAZZI'},
+  {id:'8000012539',dep:4753,nombre:'SURTIMAYORISTA CURUMANI',            ciudad:'CURUMANI'},
+  {id:'8000012540',dep:4755,nombre:'SURTIMAYORISTA MAICAO',              ciudad:'MAICAO'},
+  {id:'8000000711',dep:4830,nombre:'CARULLA EXPRESS SAN AGUSTIN',        ciudad:'CARTAGENA'},
+  {id:'8000000825',dep:354, nombre:'EXITO LAS FLORES VALLEDUPAR CV',     ciudad:'VALLEDUPAR'},
+  {id:'8000000848',dep:357, nombre:'EXITO ALAMEDAS DEL SINU MONTER',     ciudad:'MONTERIA'},
+  {id:'8000000194',dep:362, nombre:'EXITO BUENA VISTA (CV) BLLA',        ciudad:'BARRANQUILLA'},
+  {id:'8000000193',dep:363, nombre:'EXITO BUENA VISTA SANTA MARTA',      ciudad:'SANTA MARTA'},
+  {id:'8000000190',dep:366, nombre:'EXITO MURILLO (CV)BARRANQUILLA',     ciudad:'BARRANQUILLA'},
+  {id:'8000000706',dep:367, nombre:'EXITO SAN DIEGO CARTAGENA (CV)',     ciudad:'CARTAGENA'},
+  {id:'8000000139',dep:368, nombre:'EXITO SAN FRANCISCO (CV) BLLA',      ciudad:'BARRANQUILLA'},
+  {id:'8000000189',dep:369, nombre:'EXITO PANORAMA CL30 (CV) BQLLA',     ciudad:'BARRANQUILLA'},
+  {id:'8000000734',dep:370, nombre:'EXITO CASTELLANA CARTAGENA (CV',     ciudad:'CARTAGENA'},
+  {id:'8000000707',dep:371, nombre:'EXITO MATUNA CARTAGENA (CV)',         ciudad:'CARTAGENA'},
+  {id:'8000001297',dep:4033,nombre:'EXITO LORICA',                       ciudad:'LORICA'},
+  {id:'8000000803',dep:4036,nombre:'EXITO SABANALARGA',                  ciudad:'SABANALARGA'},
+  {id:'8000000132',dep:4706,nombre:'SURTIMAYORISTA MACARENA',            ciudad:'BARRANQUILLA'},
+  {id:'8000000131',dep:4715,nombre:'SURTIMAYORISTA PRADERA',             ciudad:'BARRANQUILLA'},
+  {id:'8000000199',dep:4800,nombre:'CARULLA CIUDAD DEL MAR',             ciudad:'BARRANQUILLA'},
+  {id:'8000000956',dep:4804,nombre:'CARULLA BELLAVISTA',                 ciudad:'SANTA MARTA'},
+  {id:'8000008070',dep:4816,nombre:'CARULLA MALL PLAZA BUENAVISTA',      ciudad:'BARRANQUILLA'},
+  {id:'8000009775',dep:4821,nombre:'CARULLA EXPRESS CALLE MONEDA',       ciudad:'CARTAGENA'},
+  {id:'8000010864',dep:4826,nombre:'CARULLA EXPRESS LAS VELAS',          ciudad:'CARTAGENA'},
+  {id:'8000000749',dep:634, nombre:'CARULLA CASTILLO GRANDE',            ciudad:'CARTAGENA'},
+  {id:'8000013820',dep:4883,nombre:'CAVA CARULLA RAMBLAS',               ciudad:'CARTAGENA'},
+  {id:'8000000748',dep:670, nombre:'CARULLA EXPRESS CALLE ROMAN',        ciudad:'CARTAGENA'},
+];
+
+const MESES=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const SKIP=new Set(['de','del','la','las','los','y','e','a','el','en']);
+function tc(s){return s.toLowerCase().split(' ').map((w,i)=>(!i||!SKIP.has(w))?w[0].toUpperCase()+w.slice(1):w).join(' ')}
+
+let step=1,ean='',pdv=null,records=[],scanning=false;
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const sc=document.getElementById('sel-ciudad');
+  [...new Set(TIENDAS.map(t=>t.ciudad))].sort().forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=tc(c);sc.appendChild(o);
+  });
+  buildDias(31); // pre-cargar días 1-31 por defecto
+  renderStep();
+});
+
+function renderStep(){
+  for(let i=1;i<=4;i++){
+    document.getElementById('dot-'+i).className='sdot'+(i<step?' done':i===step?' active':'');
+    const l=document.getElementById('line-'+i);if(l)l.className='sline'+(i<step?' done':'');
+  }
+  document.getElementById('btn-back').style.display=step>1?'flex':'none';
+  document.getElementById('btn-next').textContent=step===4?'✓ Registrar':'Siguiente →';
+}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+
+function goNext(){
+  if(step===1){if(!ean){toast('Escanea o ingresa un EAN primero','err');return;}step=2;show('screen-2');}
+  else if(step===2){
+    const c=document.getElementById('sel-ciudad').value,p=document.getElementById('sel-pdv').value;
+    if(!c){toast('Selecciona tu ciudad','err');return;}
+    if(!p){toast('Selecciona el punto de venta','err');return;}
+    pdv=TIENDAS.find(t=>t.id===p);step=3;show('screen-3');
+  }
+  else if(step===3){const q=parseInt(document.getElementById('qty').value);if(isNaN(q)||q<0){toast('Cantidad inválida','err');return;}step=4;show('screen-4');}
+  else if(step===4){save();return;}
+  renderStep();
+}
+function goBack(){if(step>1){step--;show('screen-'+step);renderStep();}}
+function goRecords(){show('screen-records');document.getElementById('bnav').style.display='none';document.getElementById('steps-bar').style.display='none';switchTab('l');}
+function backToNew(){
+  show('screen-1');
+  document.getElementById('bnav').style.display='flex';
+  document.getElementById('steps-bar').style.display='flex';
+  step=1;reset();renderStep();
+}
+
+// SCANNER
+function startScan(){
+  if(scanning)return;scanning=true;
+  document.getElementById('scan-zone').classList.add('active');
+  document.getElementById('scan-idle').style.display='none';
+  document.getElementById('scan-ov').style.display='flex';
+  Quagga.init({
+    inputStream:{name:'Live',type:'LiveStream',target:document.getElementById('qgt'),
+      constraints:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},
+    decoder:{readers:['ean_reader','ean_8_reader','code_128_reader','upc_reader']},locate:true
+  },err=>{if(err){toast('No se pudo acceder a la cámara','err');stopScan();return;}Quagga.start();});
+  Quagga.onDetected(r=>{const c=r.codeResult.code;if(c&&c.length>=8){stopScan();setEAN(c);}});
+}
+function stopScan(){
+  scanning=false;try{Quagga.stop();}catch(e){}
+  document.getElementById('scan-zone').classList.remove('active');
+  document.getElementById('scan-idle').style.display='flex';
+  document.getElementById('scan-ov').style.display='none';
+  document.getElementById('qgt').innerHTML='';
+}
+function retryScan(){ean='';document.getElementById('ean-result').classList.remove('show');document.getElementById('ean-in').value='';startScan();}
+function setEAN(c){
+  ean=c;
+  document.getElementById('ean-disp').textContent=c;
+  const desc=PRODUCTOS[c.replace(/^0+/,'')] || PRODUCTOS[c] || null;
+  const subEl=document.querySelector('.ean-sub');
+  if(subEl){
+    if(desc){
+      subEl.textContent=desc;
+      subEl.style.color='var(--txt-dark)';
+      subEl.style.fontWeight='600';
+    } else {
+      subEl.textContent='Producto no encontrado en el catálogo';
+      subEl.style.color='var(--txt-soft)';
+      subEl.style.fontWeight='400';
+    }
+  }
+  document.getElementById('ean-result').classList.add('show');
+  toast('¡Código capturado!','ok');
+}
+function manualEAN(){const v=document.getElementById('ean-in').value.trim();if(!v||v.length<8){toast('EAN inválido (mín. 8 dígitos)','err');return;}setEAN(v);}
+
+// CIUDAD → PDV
+function filterPDVs(){
+  const c=document.getElementById('sel-ciudad').value;
+  const s=document.getElementById('sel-pdv');
+  s.innerHTML='<option value="">— Selecciona el PDV —</option>';
+  s.disabled=!c;
+  if(!c)return;
+  TIENDAS.filter(t=>t.ciudad===c).sort((a,b)=>a.nombre.localeCompare(b.nombre)).forEach(p=>{
+    const o=document.createElement('option');o.value=p.id;o.textContent=p.nombre;s.appendChild(o);
+  });
+}
+
+// FECHA
+function buildDias(max){
+  const sd=document.getElementById('sel-dia');
+  const prev=parseInt(sd.value)||0;
+  const clamped=prev>max?max:prev; // si el día actual supera el máximo, lo mueve al máximo
+  sd.innerHTML='<option value="">Día</option>';
+  for(let d=1;d<=max;d++){
+    const o=document.createElement('option');
+    o.value=d;o.textContent=String(d).padStart(2,'0');
+    if(d===clamped)o.selected=true;
+    sd.appendChild(o);
+  }
+}
+
+function updateDias(){
+  const m=parseInt(document.getElementById('sel-mes').value);
+  const y=parseInt(document.getElementById('sel-anio').value)||2026;
+  let max=31;
+  if(m===2)max=(y%400===0||(y%4===0&&y%100!==0))?29:28;
+  else if([4,6,9,11].includes(m))max=30;
+  buildDias(max);
+}
+
+function chQty(d){const i=document.getElementById('qty');i.value=Math.max(0,(parseInt(i.value)||0)+d);}
+
+// SAVE
+function save(){
+  const dia=document.getElementById('sel-dia').value;
+  const mes=document.getElementById('sel-mes').value;
+  const anio=document.getElementById('sel-anio').value;
+  if(!mes){toast('Selecciona el mes','err');return;}
+  if(!dia){toast('Selecciona el día','err');return;}
+  const qty=parseInt(document.getElementById('qty').value)||0;
+  const dp=String(dia).padStart(2,'0'),mp=String(mes).padStart(2,'0');
+  records.push({ean,idCliente:pdv.id,pdv:pdv.nombre,dep:pdv.dep,ciudad:pdv.ciudad,
+    cantidad:qty,fechaCSV:`${dp}/${mp}/${anio}`,
+    fechaShow:`${dp} ${MESES[parseInt(mes)]} ${anio}`,
+    ts:new Date().toLocaleString('es-CO')});
+  badge();renderList();
+
+  // Mostrar pantalla de confirmación
+  const desc = PRODUCTOS[ean.replace(/^0+/,'')] || PRODUCTOS[ean] || ean;
+  document.getElementById('ok-desc').textContent = desc;
+  document.getElementById('ok-pdv').textContent = `${pdv.nombre} · ${tc(pdv.ciudad)} · ${qty} uds · Vence: ${dp} ${MESES[parseInt(mes)]} ${anio}`;
+  show('screen-ok');
+  document.getElementById('bnav').style.display = 'none';
+  document.getElementById('steps-bar').style.display = 'none';
+  toast('¡Registro guardado!','ok');
+}
+
+function badge(){
+  const n=records.length;
+  document.getElementById('rec-badge').textContent=n+' reg.';
+  document.getElementById('tab-count').textContent=n;
+  document.getElementById('rec-count').textContent=n;
+  document.getElementById('btn-exp').disabled=n===0;
+}
+function renderList(){
+  const el=document.getElementById('rec-list');
+  if(!records.length){el.innerHTML='<div class="empty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><p>No hay registros aún.</p></div>';return;}
+  el.innerHTML=records.map((r,i)=>`<div class="rec-item"><div class="rn">${i+1}</div><div class="ri"><div class="ri-ean">${r.ean}</div><div class="ri-pdv">${r.pdv}</div><div class="ri-meta">${tc(r.ciudad)} · ${r.cantidad} uds · Vence: ${r.fechaShow}</div></div></div>`).join('');
+}
+
+function switchTab(t){
+  document.getElementById('tab-n').className='tbtn'+(t==='n'?' active':'');
+  document.getElementById('tab-l').className='tbtn'+(t==='l'?' active':'');
+  document.getElementById('tnc').style.display=t==='n'?'block':'none';
+  document.getElementById('tlc').style.display=t==='l'?'block':'none';
+  if(t==='n')document.getElementById('tnc').innerHTML=`<div style="text-align:center;padding:36px 20px"><p style="font-size:14px;color:var(--txt-soft);margin-bottom:22px;line-height:1.6">¿Agregar otro producto?</p><button class="btn-primary" onclick="backToNew()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo reporte</button></div>`;
+}
+
+function exportCSV(){
+  if(!records.length)return;
+  const h=['EAN COMPLETO','ID CLIENTE','PDV','DEPENDENCIA','CIUDAD','CANTIDAD','FECHA VENCIMIENTO','FECHA REGISTRO'];
+  const rows=records.map(r=>[r.ean,r.idCliente,`"${r.pdv}"`,r.dep,r.ciudad,r.cantidad,r.fechaCSV,r.ts]);
+  const csv=[h,...rows].map(r=>r.join(',')).join('\n');
+  const b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');
+  a.href=u;a.download=`Alpina_FechasCortas_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  URL.revokeObjectURL(u);toast('CSV exportado ✓','ok');
+}
+
+function reset(){
+  ean='';pdv=null;
+  document.getElementById('ean-result').classList.remove('show');
+  document.getElementById('ean-in').value='';
+  document.getElementById('sel-ciudad').value='';
+  document.getElementById('sel-pdv').innerHTML='<option value="">— Primero selecciona ciudad —</option>';
+  document.getElementById('sel-pdv').disabled=true;
+  document.getElementById('qty').value='0';
+  document.getElementById('sel-mes').value='';
+  buildDias(31);
+  document.getElementById('sel-anio').value='2026';
+  stopScan();
+}
+
+let tt;
+function toast(msg,type=''){
+  clearTimeout(tt);const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show'+(type?' '+type:'');
+  tt=setTimeout(()=>{el.className='toast';},2800);
+}
+</script>
+</body>
+</html>
