@@ -769,6 +769,18 @@ function updateDias(){
 
 function chQty(d){const i=document.getElementById('qty');i.value=Math.max(0,(parseInt(i.value)||0)+d);}
 
+// GOOGLE SHEETS
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxoy2Dxf9E5Jz21YH5hmK5FLdQtuGtlK4ZAeHGIIaupRyyWXmfBhcXDLb4Rjd50F2AANQ/exec';
+
+function enviarASheets(registro) {
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(registro)
+  }).catch(err => console.warn('Error enviando a Sheets:', err));
+}
+
 // SAVE
 function save(){
   const dia=document.getElementById('sel-dia').value;
@@ -778,14 +790,30 @@ function save(){
   if(!dia){toast('Selecciona el día','err');return;}
   const qty=parseInt(document.getElementById('qty').value)||0;
   const dp=String(dia).padStart(2,'0'),mp=String(mes).padStart(2,'0');
-  records.push({ean,idCliente:pdv.id,pdv:pdv.nombre,dep:pdv.dep,ciudad:pdv.ciudad,
-    cantidad:qty,fechaCSV:`${dp}/${mp}/${anio}`,
-    fechaShow:`${dp} ${MESES[parseInt(mes)]} ${anio}`,
-    ts:new Date().toLocaleString('es-CO')});
-  badge();renderList();
+  const desc = PRODUCTOS[ean.replace(/^0+/,'')] || PRODUCTOS[ean] || ean;
+
+  const registro = {
+    ean,
+    producto: desc,
+    idCliente: pdv.id,
+    pdv: pdv.nombre,
+    ciudad: pdv.ciudad,
+    cantidad: qty,
+    fechaVence: `${dp}/${mp}/${anio}`,
+    ts: new Date().toLocaleString('es-CO')
+  };
+
+  records.push({...registro,
+    dep: pdv.dep,
+    fechaCSV: `${dp}/${mp}/${anio}`,
+    fechaShow: `${dp} ${MESES[parseInt(mes)]} ${anio}`
+  });
+
+  badge();
+  renderList();
+  enviarASheets(registro);
 
   // Mostrar pantalla de confirmación
-  const desc = PRODUCTOS[ean.replace(/^0+/,'')] || PRODUCTOS[ean] || ean;
   document.getElementById('ok-desc').textContent = desc;
   document.getElementById('ok-pdv').textContent = `${pdv.nombre} · ${tc(pdv.ciudad)} · ${qty} uds · Vence: ${dp} ${MESES[parseInt(mes)]} ${anio}`;
   show('screen-ok');
